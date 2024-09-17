@@ -2,12 +2,12 @@ import json
 from getpass import getpass
 from urllib.request import urlopen
 
-from llama_index.core import Document, QueryBundle, Settings, VectorStoreIndex
-from llama_index.core.ingestion import IngestionPipeline
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.llms.ollama import Ollama
-from llama_index.vector_stores.elasticsearch import ElasticsearchStore
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnablePassthrough
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.llms import Ollama
+from langchain_elasticsearch import ElasticsearchStore, SparseVectorStrategy
 
 # https://www.elastic.co/search-labs/tutorials/install-elasticsearch/elastic-cloud#finding-your-cloud-id
 ELASTIC_CLOUD_ID = getpass("Elastic Cloud ID: ")
@@ -43,6 +43,8 @@ es_vector_store = ElasticsearchStore(
 
 es_vector_store.add_documents(documents=docs)
 
+llm = Ollama(model="llama3")
+
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
@@ -50,11 +52,10 @@ def format_docs(docs):
 
 retriever = es_vector_store.as_retriever()
 template = """Answer the question based only on the following context:\n
+    {context}
 
-                    {context}
-                    
-                    Question: {question}
-                   """
+    Question: {question}
+    """
 prompt = ChatPromptTemplate.from_template(template)
 chain = (
     {"context": retriever | format_docs, "question": RunnablePassthrough()}
