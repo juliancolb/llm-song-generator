@@ -1,14 +1,13 @@
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core.ingestion import IngestionPipeline
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.vector_stores.elasticsearch import ElasticsearchStore
-from llama_index.core import VectorStoreIndex, QueryBundle
-from llama_index.llms.ollama import Ollama
-from llama_index.core import Document, Settings
+import json
 from getpass import getpass
 from urllib.request import urlopen
-import json
 
+from llama_index.core import Document, QueryBundle, Settings, VectorStoreIndex
+from llama_index.core.ingestion import IngestionPipeline
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.embeddings.ollama import OllamaEmbedding
+from llama_index.llms.ollama import Ollama
+from llama_index.vector_stores.elasticsearch import ElasticsearchStore
 
 # https://www.elastic.co/search-labs/tutorials/install-elasticsearch/elastic-cloud#finding-your-cloud-id
 ELASTIC_CLOUD_ID = getpass("Elastic Cloud ID: ")
