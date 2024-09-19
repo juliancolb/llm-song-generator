@@ -1,9 +1,20 @@
 from langchain_core.embeddings import FakeEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_elasticsearch import ElasticsearchStore
 from uuid import uuid4
 from langchain_core.documents import Document
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.llms import Ollama
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnablePassthrough
+from langchain_elasticsearch import SparseVectorStrategy
+from getpass import getpass
+from urllib.request import urlopen
+import json
 
-embeddings = FakeEmbeddings(size=4096)
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
+# embeddings = FakeEmbeddings(size=4096)
 
 vector_store = ElasticsearchStore(
     "langchain-demo", embedding=embeddings, es_url="http://localhost:9200"
@@ -98,3 +109,5 @@ retriever = vector_store.as_retriever(
     search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.2}
 )
 retriever.invoke("Stealing from the bank is a crime")
+
+llm = Ollama(model="llama3")
