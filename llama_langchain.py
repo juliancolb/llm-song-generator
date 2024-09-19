@@ -1,5 +1,4 @@
 import json
-from getpass import getpass
 from urllib.request import urlopen
 
 from langchain.prompts import ChatPromptTemplate
@@ -9,11 +8,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.llms import Ollama
 from langchain_elasticsearch import ElasticsearchStore, SparseVectorStrategy
 
-# https://www.elastic.co/search-labs/tutorials/install-elasticsearch/elastic-cloud#finding-your-cloud-id
-ELASTIC_CLOUD_ID = getpass("Elastic Cloud ID: ")
-
-# https://www.elastic.co/search-labs/tutorials/install-elasticsearch/elastic-cloud#creating-an-api-key
-ELASTIC_API_KEY = getpass("Elastic Api Key: ")
 
 url = "https://raw.githubusercontent.com/elastic/elasticsearch-labs/main/datasets/workplace-documents.json"
 response = urlopen(url)
