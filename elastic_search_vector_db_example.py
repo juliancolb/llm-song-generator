@@ -110,4 +110,25 @@ retriever = vector_store.as_retriever(
 )
 retriever.invoke("Stealing from the bank is a crime")
 
-llm = Ollama(model="llama3")
+llm = Ollama(model="llama3.1")
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+retriever = vector_store.as_retriever()
+template = """Answer the question based only on the following context:\n
+
+{context}
+
+Question: {question}
+"""
+prompt = ChatPromptTemplate.from_template(template)
+chain = (
+{"context": retriever | format_docs, "question": RunnablePassthrough()}
+| prompt
+| llm
+| StrOutputParser()
+)
+
+print("About to invoke LLM")
+chain.invoke("What are the organizations sales goals?")
