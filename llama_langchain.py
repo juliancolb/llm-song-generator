@@ -34,9 +34,9 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
 )
 docs = text_splitter.create_documents(content, metadatas=metadata)
 
+
 es_vector_store = ElasticsearchStore(
-    es_cloud_id=ELASTIC_CLOUD_ID,
-    es_api_key=ELASTIC_API_KEY,
+    es_url="http://localhost:9201",
     index_name="workplace_index_elser",
     strategy=SparseVectorStrategy(model_id=".elser_model_2_linux-x86_64"),
 )
