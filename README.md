@@ -9,5 +9,13 @@ On windows, type this to activate your virtual environment:
 Use this command to install the project dependencies: 
 `pip install -r requirements.txt`
 
+The langchain demo is based on this code: 
+`https://python.langchain.com/docs/integrations/vectorstores/elasticsearch/`
+
+And this tutorial: 
+`https://www.elastic.co/search-labs/blog/elasticsearch-rag-with-llama3-opensource-and-elastic`
+
 To run the elastic search vector database example, make sure to have docker installed and use this command to create a local elastic search vector instance that has no authentication: 
 `%docker run -p 9200:9200 -e "discovery.type=single-node" -e "xpack.security.enabled=false" -e "xpack.security.http.ssl.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:8.12.1`
+
+Make sure to have docker installed and have the docker container running locally.
