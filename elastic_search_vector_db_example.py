@@ -12,6 +12,23 @@ from langchain_elasticsearch import SparseVectorStrategy
 from getpass import getpass
 from urllib.request import urlopen
 import json
+import getpass
+import os
+from langchain_groq import ChatGroq
+
+
+# if "GROQ_API_KEY" not in os.environ:
+#     os.environ["GROQ_API_KEY"] = getpass.getpass("Enter your Groq API key: ")
+
+groq_llm = ChatGroq(
+    model="mixtral-8x7b-32768",
+    temperature=0,
+    max_tokens=None,
+    timeout=None,
+    max_retries=2,
+    api_key='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'
+    # other params...
+)
 
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-mpnet-base-v2")
 # embeddings = FakeEmbeddings(size=4096)
@@ -70,6 +87,11 @@ document_10 = Document(
     metadata={"source": "tweet"},
 )
 
+document_11 = Document(
+    page_content="The organizations goal is to make a trillion dollars this year.",
+    metadata={"source": "tweet"},
+)
+
 documents = [
     document_1,
     document_2,
@@ -81,6 +103,7 @@ documents = [
     document_8,
     document_9,
     document_10,
+    document_11
 ]
 uuids = [str(uuid4()) for _ in range(len(documents))]
 
@@ -110,7 +133,7 @@ retriever = vector_store.as_retriever(
 )
 retriever.invoke("Stealing from the bank is a crime")
 
-llm = Ollama(model="llama3.1")
+# llm = Ollama(model="llama3.1")
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
@@ -126,9 +149,13 @@ prompt = ChatPromptTemplate.from_template(template)
 chain = (
 {"context": retriever | format_docs, "question": RunnablePassthrough()}
 | prompt
-| llm
+| groq_llm
 | StrOutputParser()
 )
 
 print("About to invoke LLM")
-chain.invoke("What are the organizations sales goals?")
+# Invoke the chain and capture the response
+response = chain.invoke("I want you to write me a song about a great deep learning framework.")
+
+# Print the LLM's response
+print("LLM Response:", response)
