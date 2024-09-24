@@ -15,10 +15,13 @@ import json
 import getpass
 import os
 from langchain_groq import ChatGroq
+from dotenv import load_dotenv
 
+# Load the environment variables from the .env file
+load_dotenv()
 
-# if "GROQ_API_KEY" not in os.environ:
-#     os.environ["GROQ_API_KEY"] = getpass.getpass("Enter your Groq API key: ")
+# Access the environment variable
+groq_api_key = os.getenv("GROQ_API_KEY")
 
 groq_llm = ChatGroq(
     model="mixtral-8x7b-32768",
@@ -26,7 +29,7 @@ groq_llm = ChatGroq(
     max_tokens=None,
     timeout=None,
     max_retries=2,
-    api_key='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'
+    api_key=groq_api_key
     # other params...
 )
 
