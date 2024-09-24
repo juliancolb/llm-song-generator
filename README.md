@@ -6,6 +6,9 @@ Make sure to be in a virtual environment by initializing a venv in the root of y
 On windows, type this to activate your virtual environment: 
 `.\venv\Scripts\activate`
 
+On Mac, type this to activate your virtual environment: 
+`source venv/bin/activate`
+
 Use this command to install the project dependencies: 
 `pip install -r requirements.txt`
 
