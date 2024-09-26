@@ -27,3 +27,22 @@ To run the elastic search vector database example, make sure to have docker inst
 Make sure to set up your .env file and place GROQ_API_KEY=your_key in there.
 
 Make sure to have docker installed and have the docker container running locally.
+
+If you cannot use the versioned requirements.txt file, please use these pip installs instead:
+`pip install -qU langchain-elasticsearch`
+`pip install -qU langchain-huggingface`
+`pip install -qU langchain-core`
+`pip install langchain`
+`    pip install llama-index
+    !pip install llama-index-cli
+    !pip install llama-index-core
+    !pip install llama-index-embeddings-elasticsearch
+    !pip install llama-index-embeddings-ollama
+    !pip install llama-index-legacy
+    !pip install llama-index-llms-ollama
+    !pip install llama-index-readers-elasticsearch
+    !pip install llama-index-readers-file
+    !pip install llama-index-vector-stores-elasticsearch
+    !pip install llamaindex-py-client
+`
+`pip install -qU langchain-groq`
