@@ -110,6 +110,7 @@ def initialize_vector_store():
     This function checks if the index exists and creates it with mappings if not.
     It then adds documents if the index is empty.
     """
+    # TODO this is where wikipedia parsing to RAG dataset will be implemented so we can load our dataset into the Flask Server
     vector_store.add_documents(documents=documents, ids=uuids)
 
 # Initialize the vector store on startup
