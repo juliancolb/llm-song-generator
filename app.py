@@ -16,6 +16,7 @@ from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import os
 import numpy as np
+from datasets import load_dataset
 
 # Load environment variables from .env file
 load_dotenv()
@@ -53,56 +54,56 @@ vector_store = ElasticsearchStore(
     # es_url=f"http://{ES_HOST}:{ES_PORT}"
 )
 
-# Sample Documents to Add
-documents = [
-    Document(
-        page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
-        metadata={"source": "tweet"},
-    ),
-    Document(
-        page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
-        metadata={"source": "news"},
-    ),
-    Document(
-        page_content="Building an exciting new project with LangChain - come check it out!",
-        metadata={"source": "tweet"},
-    ),
-    Document(
-        page_content="Robbers broke into the city bank and stole $1 million in cash.",
-        metadata={"source": "news"},
-    ),
-    Document(
-        page_content="Wow! That was an amazing movie. I can't wait to see it again.",
-        metadata={"source": "tweet"},
-    ),
-    Document(
-        page_content="Is the new iPhone worth the price? Read this review to find out.",
-        metadata={"source": "website"},
-    ),
-    Document(
-        page_content="The top 10 soccer players in the world right now.",
-        metadata={"source": "website"},
-    ),
-    Document(
-        page_content="LangGraph is the best framework for building stateful, agentic applications!",
-        metadata={"source": "tweet"},
-    ),
-    Document(
-        page_content="The stock market is down 500 points today due to fears of a recession.",
-        metadata={"source": "news"},
-    ),
-    Document(
-        page_content="I have a bad feeling I am going to get deleted :(",
-        metadata={"source": "tweet"},
-    ),
-    Document(
-        page_content="The organization's goal is to make a trillion dollars this year.",
-        metadata={"source": "tweet"},
-    ),
-]
+# # Sample Documents to Add
+# documents = [
+#     Document(
+#         page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
+#         metadata={"source": "tweet"},
+#     ),
+#     Document(
+#         page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
+#         metadata={"source": "news"},
+#     ),
+#     Document(
+#         page_content="Building an exciting new project with LangChain - come check it out!",
+#         metadata={"source": "tweet"},
+#     ),
+#     Document(
+#         page_content="Robbers broke into the city bank and stole $1 million in cash.",
+#         metadata={"source": "news"},
+#     ),
+#     Document(
+#         page_content="Wow! That was an amazing movie. I can't wait to see it again.",
+#         metadata={"source": "tweet"},
+#     ),
+#     Document(
+#         page_content="Is the new iPhone worth the price? Read this review to find out.",
+#         metadata={"source": "website"},
+#     ),
+#     Document(
+#         page_content="The top 10 soccer players in the world right now.",
+#         metadata={"source": "website"},
+#     ),
+#     Document(
+#         page_content="LangGraph is the best framework for building stateful, agentic applications!",
+#         metadata={"source": "tweet"},
+#     ),
+#     Document(
+#         page_content="The stock market is down 500 points today due to fears of a recession.",
+#         metadata={"source": "news"},
+#     ),
+#     Document(
+#         page_content="I have a bad feeling I am going to get deleted :(",
+#         metadata={"source": "tweet"},
+#     ),
+#     Document(
+#         page_content="The organization's goal is to make a trillion dollars this year.",
+#         metadata={"source": "tweet"},
+#     ),
+# ]
 
-# Generate UUIDs for Documents
-uuids = [str(uuid4()) for _ in range(len(documents))]
+# # Generate UUIDs for Documents
+# uuids = [str(uuid4()) for _ in range(len(documents))]
 
 def initialize_vector_store():
     """
@@ -111,8 +112,30 @@ def initialize_vector_store():
     It then adds documents if the index is empty.
     """
     # TODO this is where wikipedia parsing to RAG dataset will be implemented so we can load our dataset into the Flask Server
-    vector_store.add_documents(documents=documents, ids=uuids)
+    # vector_store.add_documents(documents=documents, ids=uuids)
+    
+    # Load dataset using the datasets library from Hugging Face
+    dataset = load_dataset('rahular/simple-wikipedia', split='train')  # Replace with your actual dataset name
+    print("The dataset has been loaded")
+    # Iterate through the dataset and convert to LangChain documents
+    documents = []
+    print("Starting to create the documents")
+    i = 0
+    for example in dataset:
+        i +=1
+        page_content = example['text']  # Use 'text' field from the dataset as the content
+        metadata = {}  # If there are other fields to be added as metadata, update this accordingly
+        documents.append(Document(page_content=page_content, metadata=metadata))
+        if i > 100:
+            break
 
+    print("The documents have been created")
+    # Generate UUIDs for the new documents
+    uuids = [str(uuid4()) for _ in range(len(documents))]
+
+    # Add documents to Elasticsearch vector store
+    vector_store.add_documents(documents=documents, ids=uuids)
+    print("The documents are added to the vector store")
 # Initialize the vector store on startup
 initialize_vector_store()
 

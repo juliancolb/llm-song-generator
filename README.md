@@ -46,3 +46,4 @@ If you cannot use the versioned requirements.txt file, please use these pip inst
     !pip install llamaindex-py-client
 `
 `pip install -qU langchain-groq`
+`pip install datasets`
