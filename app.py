@@ -1,32 +1,31 @@
 # app.py
 
-from flask import Flask, request, jsonify
-from langchain_core.embeddings import FakeEmbeddings
-from langchain_huggingface.embeddings import HuggingFaceEmbeddings
-from langchain_elasticsearch import ElasticsearchStore
+import os
 from uuid import uuid4
-from langchain_core.documents import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.llms import Ollama
+
+from datasets import load_dataset
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
-from langchain_elasticsearch import SparseVectorStrategy
+from langchain_core.documents import Document
+from langchain_elasticsearch import ElasticsearchStore  # , SparseVectorStrategy
 from langchain_groq import ChatGroq
-from dotenv import load_dotenv
-import os
-import numpy as np
-from datasets import load_dataset
-from suno import Suno, ModelVersions 
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
+from suno import ModelVersions, Suno
 
-
+# import numpy as np
+# from langchain.text_splitter import RecursiveCharacterTextSplitter
+# from langchain_community.llms import Ollama
+# from langchain_core.embeddings import FakeEmbeddings
 # Load environment variables from .env file
 load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
 
-client = Suno(cookie='your-key-here', model_version=ModelVersions.CHIRP_V3_5)
+client = Suno(cookie="your-key-here", model_version=ModelVersions.CHIRP_V3_5)
 
 print("The client has been initalized and the token is now valid.")
 
@@ -43,7 +42,7 @@ groq_llm = ChatGroq(
     max_tokens=None,
     timeout=None,
     max_retries=2,
-    api_key=GROQ_API_KEY
+    api_key=GROQ_API_KEY,
     # Add other parameters if necessary
 )
 
@@ -111,6 +110,7 @@ vector_store = ElasticsearchStore(
 # # Generate UUIDs for Documents
 # uuids = [str(uuid4()) for _ in range(len(documents))]
 
+
 def initialize_vector_store():
     """
     Initialize the Elasticsearch vector store by adding documents.
@@ -119,17 +119,21 @@ def initialize_vector_store():
     """
     # TODO this is where wikipedia parsing to RAG dataset will be implemented so we can load our dataset into the Flask Server
     # vector_store.add_documents(documents=documents, ids=uuids)
-    
+
     # Load dataset using the datasets library from Hugging Face
-    dataset = load_dataset('rahular/simple-wikipedia', split='train')  # Replace with your actual dataset name
+    dataset = load_dataset(
+        "rahular/simple-wikipedia", split="train"
+    )  # Replace with your actual dataset name
     print("The dataset has been loaded")
     # Iterate through the dataset and convert to LangChain documents
     documents = []
     print("Starting to create the documents")
     i = 0
     for example in dataset:
-        i +=1
-        page_content = example['text']  # Use 'text' field from the dataset as the content
+        i += 1
+        page_content = example[
+            "text"
+        ]  # Use 'text' field from the dataset as the content
         metadata = {}  # If there are other fields to be added as metadata, update this accordingly
         documents.append(Document(page_content=page_content, metadata=metadata))
         if i > 100:
@@ -142,8 +146,11 @@ def initialize_vector_store():
     # Add documents to Elasticsearch vector store
     vector_store.add_documents(documents=documents, ids=uuids)
     print("The documents are added to the vector store")
+
+
 # Initialize the vector store on startup
 initialize_vector_store()
+
 
 # Define the RAG Chain
 def create_chain():
@@ -151,10 +158,9 @@ def create_chain():
     Creates the Retrieval-Augmented Generation (RAG) chain.
     """
     retriever = vector_store.as_retriever(
-        search_type="similarity_score_threshold",
-        search_kwargs={"score_threshold": 0.2}
+        search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.2}
     )
-    
+
     template = """Answer the question based only on the following context:\n
 
 {context}
@@ -162,15 +168,16 @@ def create_chain():
 Question: {question}
 """
     prompt = ChatPromptTemplate.from_template(template)
-    
+
     chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
         | prompt
         | groq_llm
         | StrOutputParser()
     )
-    
+
     return chain
+
 
 def format_docs(docs):
     """
@@ -178,48 +185,54 @@ def format_docs(docs):
     """
     return "\n\n".join(doc.page_content for doc in docs)
 
+
 # Initialize the chain
 chain = create_chain()
 
-@app.route('/generate_song', methods=['POST'])
+
+@app.route("/generate_song", methods=["POST"])
 def generate_song():
     """
     API endpoint to generate song lyrics based on user input.
     Expects a JSON payload with a 'query' field.
     """
     data = request.get_json()
-    
-    if not data or 'query' not in data:
-        return jsonify({'error': 'No query provided'}), 400
-    
-    user_query = data['query']
-    
+
+    if not data or "query" not in data:
+        return jsonify({"error": "No query provided"}), 400
+
+    user_query = data["query"]
+
     try:
         # Invoke the RAG chain with the user query
         response = chain.invoke(user_query)
-        
-        # Generate a song songs = 
-        songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
-        # Download generated songs for song in songs: 
 
-        file_path = ''
+        # Generate a song songs =
+        songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
+        # Download generated songs for song in songs:
+
+        file_path = ""
         for song in songs:
             file_path = client.download(song=song)
             print(f"Song downloaded to: {file_path}")
 
-        return jsonify({'lyrics': response, 'file_path': str(file_path)})
-    
+        return jsonify({"lyrics": response, "file_path": str(file_path)})
+
     except Exception as e:
         print(f"Error during processing: {e}")
-        return jsonify({'error': 'An error occurred while processing your request.'}), 500
+        return jsonify(
+            {"error": "An error occurred while processing your request."}
+        ), 500
 
-@app.route('/health', methods=['GET'])
+
+@app.route("/health", methods=["GET"])
 def health_check():
     """
     Health check endpoint to verify the server is running.
     """
-    return jsonify({'status': 'Server is running.'}), 200
+    return jsonify({"status": "Server is running."}), 200
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Run the Flask app
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

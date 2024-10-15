@@ -15,3 +15,7 @@ llama-index-vector-stores-elasticsearch
 llamaindex-py-client
 langchain-groq
 datasets
+flask
+dotenv
+SunoAI
+langchain_community
