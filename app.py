@@ -17,12 +17,18 @@ from dotenv import load_dotenv
 import os
 import numpy as np
 from datasets import load_dataset
+from suno import Suno, ModelVersions 
+
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
+
+client = Suno(cookie='your-key-here', model_version=ModelVersions.CHIRP_V3_5)
+
+print("The client has been initalized and the token is now valid.")
 
 # Configuration from environment variables
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -192,7 +198,16 @@ def generate_song():
         # Invoke the RAG chain with the user query
         response = chain.invoke(user_query)
         
-        return jsonify({'lyrics': response})
+        # Generate a song songs = 
+        songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
+        # Download generated songs for song in songs: 
+
+        file_path = ''
+        for song in songs:
+            file_path = client.download(song=song)
+            print(f"Song downloaded to: {file_path}")
+
+        return jsonify({'lyrics': response, 'file_path': str(file_path)})
     
     except Exception as e:
         print(f"Error during processing: {e}")
