@@ -16,6 +16,6 @@ llamaindex-py-client
 langchain-groq
 datasets
 flask
-dotenv
+python-dotenv
 SunoAI
 langchain_community
