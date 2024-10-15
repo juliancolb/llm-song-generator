@@ -1,0 +1,17 @@
+langchain-elasticsearch
+langchain-huggingface
+langchain-core
+langchain
+llama-index
+llama-index-cli
+llama-index-core
+llama-index-embeddings-elasticsearch
+llama-index-embeddings-ollama
+llama-index-legacy
+llama-index-llms-ollama
+llama-index-readers-elasticsearch
+llama-index-readers-file
+llama-index-vector-stores-elasticsearch
+llamaindex-py-client
+langchain-groq
+datasets
