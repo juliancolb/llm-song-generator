@@ -206,13 +206,10 @@ def generate_song():
     try:
         # Invoke the RAG chain with the user query
         response = chain.invoke(user_query)
-<<<<<<< HEAD
         
         # Generate a song songs = 
         songs = client.generate(prompt=response, is_custom=True, wait_audio=True)
         # Download generated songs for song in songs: 
-=======
->>>>>>> 1bc0601fc1bc70d9cb5c00459c2265d059e12aa4
 
         # Generate a song songs =
         songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
