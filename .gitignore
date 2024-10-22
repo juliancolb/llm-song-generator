@@ -5,6 +5,7 @@ __pycache__/
 
 venv2
 
+*.wav
 # C extensions
 *.so
 

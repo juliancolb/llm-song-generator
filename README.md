@@ -47,3 +47,6 @@ If you cannot use the versioned requirements.txt file, please use these pip inst
 `
 `pip install -qU langchain-groq`
 `pip install datasets`
+
+Install these libraries to get the procedural song generation working: 
+`pip install pyttsx3 librosa soundfile numpy`

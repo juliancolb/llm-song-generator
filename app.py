@@ -26,7 +26,7 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
-client = Suno(cookie='your-key-here', model_version=ModelVersions.CHIRP_V3_5)
+client = Suno(cookie='test', model_version=ModelVersions.CHIRP_V3_5)
 
 print("The client has been initalized and the token is now valid.")
 
@@ -199,7 +199,7 @@ def generate_song():
         response = chain.invoke(user_query)
         
         # Generate a song songs = 
-        songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
+        songs = client.generate(prompt=response, is_custom=True, wait_audio=True)
         # Download generated songs for song in songs: 
 
         file_path = ''
