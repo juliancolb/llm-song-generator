@@ -2,6 +2,8 @@
 
 import os
 from uuid import uuid4
+from flask import Flask, render_template, request, jsonify
+#from backend import response
 
 from datasets import load_dataset
 from dotenv import load_dotenv
@@ -25,12 +27,12 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
-client = Suno(cookie="your-key-here", model_version=ModelVersions.CHIRP_V3_5)
+client = Suno(cookie="__client=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsaWVudF8yblVRZE9jd0VpWUp3NEREakd5OXc5SjE5N3kiLCJyb3RhdGluZ190b2tlbiI6Imp4djR1MnQ5MzU2Z2o2czlmcnllaHdxbTI0NWE4M3g5ZGR6MnpwYTcifQ.j1nMDW9YuwM2wPaTrDAcWn6C23aAYs89vTssFhbO3bRyklRY0T3-LB_0F_xjCG-RmBTPcAwfqlGZDK3a7Hm3sHnxCdh0gBoeYQY2k_zR0BwQv9SQ0xI1ey2dB0wAWQ7BuWbz46BZtBF-IWoKAsjk3WP2tZRynRG_G2Cdp9tYBR3SBaLeZ2ulA7Wstj0T9PQO2K6ht4DTcmPZ3ud_ZD6cwILYh9zj78o0J0aQ7lqMMHDsjoV5eKdWaLb7fdiGQU8wT6dLO-aGqQ0ATfSZO8seAkF3NCrDa7Exjl9VW-Lh2qc13NwRvGyYt6cX6FXziYy63KhW1IWgPU6PZ16DxsUzUQ; __client_uat=1729025288; __client_uat_U9tcbTPE=1729025288; ajs_anonymous_id=9a6cf472-7fc3-4ae7-9de2-a0462d5dff5d; _ga=GA1.1.821634759.1729025310; __cf_bm=bKkN05_IAcEh6svoyzNjna4l2GLMy1FKObcAff8dudc-1730235404-1.0.1.1-WHuPJXsMdlJ67HVM_CX4gDqld4mL7zd.2dd_70QDHh7YVt0nF61TV.mzmjBZmsoMLfJsQ7zMVjwo5Ev0Sdok9g; _cfuvid=JiQ4UcbErQxEoZlAOjVyjzAor5CZYuoYBKECGA6Hb_8-1730235404296-0.0.1.1-604800000; _ga_7B0KEDD7XP=GS1.1.1730235405.2.1.1730235463.0.0.0", model_version=ModelVersions.CHIRP_V3_5)
 
 print("The client has been initalized and the token is now valid.")
 
 # Configuration from environment variables
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = "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"#os.getenv("GROQ_API_KEY")
 ES_HOST = os.getenv("ES_HOST", "localhost")
 ES_PORT = os.getenv("ES_PORT", "9200")
 ES_INDEX = os.getenv("ES_INDEX", "langchain-demo")
@@ -59,56 +61,15 @@ vector_store = ElasticsearchStore(
     # es_url=f"http://{ES_HOST}:{ES_PORT}"
 )
 
-# # Sample Documents to Add
-# documents = [
-#     Document(
-#         page_content="I had chocolate chip pancakes and scrambled eggs for breakfast this morning.",
-#         metadata={"source": "tweet"},
-#     ),
-#     Document(
-#         page_content="The weather forecast for tomorrow is cloudy and overcast, with a high of 62 degrees.",
-#         metadata={"source": "news"},
-#     ),
-#     Document(
-#         page_content="Building an exciting new project with LangChain - come check it out!",
-#         metadata={"source": "tweet"},
-#     ),
-#     Document(
-#         page_content="Robbers broke into the city bank and stole $1 million in cash.",
-#         metadata={"source": "news"},
-#     ),
-#     Document(
-#         page_content="Wow! That was an amazing movie. I can't wait to see it again.",
-#         metadata={"source": "tweet"},
-#     ),
-#     Document(
-#         page_content="Is the new iPhone worth the price? Read this review to find out.",
-#         metadata={"source": "website"},
-#     ),
-#     Document(
-#         page_content="The top 10 soccer players in the world right now.",
-#         metadata={"source": "website"},
-#     ),
-#     Document(
-#         page_content="LangGraph is the best framework for building stateful, agentic applications!",
-#         metadata={"source": "tweet"},
-#     ),
-#     Document(
-#         page_content="The stock market is down 500 points today due to fears of a recession.",
-#         metadata={"source": "news"},
-#     ),
-#     Document(
-#         page_content="I have a bad feeling I am going to get deleted :(",
-#         metadata={"source": "tweet"},
-#     ),
-#     Document(
-#         page_content="The organization's goal is to make a trillion dollars this year.",
-#         metadata={"source": "tweet"},
-#     ),
-# ]
 
-# # Generate UUIDs for Documents
-# uuids = [str(uuid4()) for _ in range(len(documents))]
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/chat', methods=['GET', 'POST'])
+def chat():
+    message = request.form['msg']
+    return generate_song(message)
 
 
 def initialize_vector_store():
@@ -190,18 +151,18 @@ def format_docs(docs):
 chain = create_chain()
 
 
-@app.route("/generate_song", methods=["POST"])
-def generate_song():
+#@app.route("/generate_song", methods=["POST"])
+def generate_song(userMessage):
     """
     API endpoint to generate song lyrics based on user input.
     Expects a JSON payload with a 'query' field.
     """
-    data = request.get_json()
+    #data = request.get_json()
 
-    if not data or "query" not in data:
-        return jsonify({"error": "No query provided"}), 400
+    ##if not data or "query" not in data:
+    #    return jsonify({"error": "No query provided"}), 400
 
-    user_query = data["query"]
+    user_query = userMessage
 
     try:
         # Invoke the RAG chain with the user query
@@ -239,4 +200,4 @@ def health_check():
 
 if __name__ == "__main__":
     # Run the Flask app
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
