@@ -1,6 +1,7 @@
 # app.py
 
 import os
+import re
 from uuid import uuid4
 from flask import Flask, render_template, request, jsonify
 #from backend import response
@@ -27,12 +28,12 @@ load_dotenv()
 # Initialize Flask app
 app = Flask(__name__)
 
-client = Suno(cookie="__client=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsaWVudF8yblVRZE9jd0VpWUp3NEREakd5OXc5SjE5N3kiLCJyb3RhdGluZ190b2tlbiI6Imp4djR1MnQ5MzU2Z2o2czlmcnllaHdxbTI0NWE4M3g5ZGR6MnpwYTcifQ.j1nMDW9YuwM2wPaTrDAcWn6C23aAYs89vTssFhbO3bRyklRY0T3-LB_0F_xjCG-RmBTPcAwfqlGZDK3a7Hm3sHnxCdh0gBoeYQY2k_zR0BwQv9SQ0xI1ey2dB0wAWQ7BuWbz46BZtBF-IWoKAsjk3WP2tZRynRG_G2Cdp9tYBR3SBaLeZ2ulA7Wstj0T9PQO2K6ht4DTcmPZ3ud_ZD6cwILYh9zj78o0J0aQ7lqMMHDsjoV5eKdWaLb7fdiGQU8wT6dLO-aGqQ0ATfSZO8seAkF3NCrDa7Exjl9VW-Lh2qc13NwRvGyYt6cX6FXziYy63KhW1IWgPU6PZ16DxsUzUQ; __client_uat=1729025288; __client_uat_U9tcbTPE=1729025288; ajs_anonymous_id=9a6cf472-7fc3-4ae7-9de2-a0462d5dff5d; _ga=GA1.1.821634759.1729025310; __cf_bm=bKkN05_IAcEh6svoyzNjna4l2GLMy1FKObcAff8dudc-1730235404-1.0.1.1-WHuPJXsMdlJ67HVM_CX4gDqld4mL7zd.2dd_70QDHh7YVt0nF61TV.mzmjBZmsoMLfJsQ7zMVjwo5Ev0Sdok9g; _cfuvid=JiQ4UcbErQxEoZlAOjVyjzAor5CZYuoYBKECGA6Hb_8-1730235404296-0.0.1.1-604800000; _ga_7B0KEDD7XP=GS1.1.1730235405.2.1.1730235463.0.0.0", model_version=ModelVersions.CHIRP_V3_5)
+client = Suno(cookie="ajs_anonymous_id=9a6cf472-7fc3-4ae7-9de2-a0462d5dff5d; _ga=GA1.1.821634759.1729025310; _cfuvid=LxAHjXLZ6.IvVp1V4Crxu7a2Lr89ZnTWoQ.Lf8q4LnM-1730387997325-0.0.1.1-604800000; __cf_bm=D8Ol4Q132.5P.YhmL36T_RzjpJzTYt6.zlq6Ygay_gs-1730406940-1.0.1.1-FXV8kc_57Z7dous41X_xSLXzPZxTKdhshFlmpf2zTWN7Pz2Ab8BXqwaKjEjAKm7aUJLkjCUyAEVtxjEXE0Ychg; __client=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNsaWVudF8yblVRZE9jd0VpWUp3NEREakd5OXc5SjE5N3kiLCJyb3RhdGluZ190b2tlbiI6ImV1eTBsOTA5ZDBoc2htYzh5djNtZ2Jxc2pkM3JpaDhjYmx0eTB2bnIifQ.vpQu-35riqVepIMJBnLaMbfUfvQ661m2lKvTO2bo_zmM_tZgDe8aQ26UN8BIiFisJ-ZnySgwa3H6BMoj-pbivPBlxStgKUpNPhL50eDxnvOtrm1cRMCtZoN8A4b-KkF9pbBNx9LuBi_NKxoY-9X4BlzSWyjurX-9wzchBgYcBGc04UKlFPT-FFQ6LV6-79DHM0nPmfupcuhnJXKhMaH8uAjhanEPuBD514zlX4uifn-gf-7GvmfDX1n7hzDDtWb4E3QV2cBxk4vjcbzvus8rhuIjN9OgnRIafmaxuyM0hgECc13valgmlXIyUEJp7hfRNKRTN6K_Pp7eapbjP7QC0A; __client_uat=1730407463; __client_uat_U9tcbTPE=1730407463; _ga_7B0KEDD7XP=GS1.1.1730407424.4.1.1730407486.0.0.0", model_version=ModelVersions.CHIRP_V3_5)
 
 print("The client has been initalized and the token is now valid.")
 
 # Configuration from environment variables
-GROQ_API_KEY = "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"#os.getenv("GROQ_API_KEY")
+GROQ_API_KEY = "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"#os.getenv("GROQ_API_KEY")
 ES_HOST = os.getenv("ES_HOST", "localhost")
 ES_PORT = os.getenv("ES_PORT", "9200")
 ES_INDEX = os.getenv("ES_INDEX", "langchain-demo")
@@ -168,20 +169,32 @@ def generate_song(userMessage):
         # Invoke the RAG chain with the user query
         response = chain.invoke(user_query)
         
-        # Generate a song songs = 
+        # Generate a single song songs = 
         songs = client.generate(prompt=response, is_custom=True, wait_audio=True)
         # Download generated songs for song in songs: 
 
+
         # Generate a song songs =
-        songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
+       # songs = client.generate(prompt=response, is_custom=False, wait_audio=True)
         # Download generated songs for song in songs:
+        
+        #file_path = os.path.join("static", "generated_song.mp3")  # Path to save in the static directory
+        
+        for music in songs:
+          file_path = client.download(song=music)
+          parts = str(music).split()
 
-        file_path = ""
-        for song in songs:
-            file_path = client.download(song=song)
-            print(f"Song downloaded to: {file_path}")
+        # Find the part that starts with "audio_url="
+        audio_url = None
+        for part in parts:
+            if part.startswith("audio_url="):
+                # Extract the URL by removing the surrounding quotes
+                audio_url = "https://audiopipe.suno.ai/?item_id=" + part.split("=")[2].strip("'")
+                break
+       
+        print(f"Song link:{audio_url}")
 
-        return jsonify({"lyrics": response, "file_path": str(file_path)})
+        return jsonify({"lyrics": response, "audio_url": str(audio_url) })
 
     except Exception as e:
         print(f"Error during processing: {e}")

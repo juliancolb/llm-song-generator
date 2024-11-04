@@ -21,12 +21,12 @@
 						<div class="card-header msg_head">
 							<div class="d-flex bd-highlight">
 								<div class="img_cont">
-									<img src="{{ url_for('static', filename='logo.jpeg')}}" class="rounded-circle user_img">
+									<!--<img src="{{ url_for('static', filename='logo.jpeg')}}" class="rounded-circle user_img">-->
 									<span class="online_icon"></span>
 								</div>
 								<div class="user_info">
-									<span>ChatBot</span>
-									<p>Ask me anything!</p>
+									<span>E-Nom Song Bot</span>
+									<p>Enter a prompt and I'll generate a song for you!</p>
 								</div>
 							</div>
 						</div>
@@ -56,7 +56,7 @@
 					const str_time = hour+":"+minute;
 					var rawText = $("#text").val();
 
-					var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ str_time + '</span></div><div class="img_cont_msg"></div></div>';
+					var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">'+ '</span></div><div class="img_cont_msg"></div></div>';
 					
 					$("#text").val("");
 					$("#messageFormeight").append(userHtml);
@@ -68,9 +68,28 @@
 						type: "POST",
 						url: "/chat",
 					}).done(function(data) {
-						var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
+						var lyrics = data.lyrics;
+    					var audioUrl = data.audio_url;
+
+   					 // Format the response to include both lyrics and file path
+   					 var botHtml = '<div class="d-flex justify-content-start mb-4">'
+           		     + '<div class="img_cont_msg"></div>'
+             		 + '<div class="msg_cotainer">'
+                	 + '<strong>Lyrics:</strong> ' + lyrics + '<br>'
+                 	 + '<a href="' + audioUrl + '" target="_blank">Download Here</a>'
+                	 + '<span class="msg_time">' + "\n" + '</span></div></div>';
+						
 						$("#messageFormeight").append($.parseHTML(botHtml));
 						hideLoading();
+					 /* var botHtml = '<div class="d-flex justify-content-start mb-4">'
+           		     + '<div class="img_cont_msg"></div>'
+             		 + '<div class="msg_cotainer">'
+                	 + '<strong>Lyrics:</strong> ' + lyrics + '<br>'
+                 	 + '<strong>File Path:</strong> <a href="' + filePath + '" target="_blank">Download Here</a>'
+                	 + '<span class="msg_time">' + "\n" +str_time + '</span></div></div>';
+						
+						$("#messageFormeight").append($.parseHTML(botHtml));
+						hideLoading();*/
 						})
 					event.preventDefault();
 				});
